@@ -1,0 +1,33 @@
+@media all and (max-width: 1024px) {
+
+	
+}
+
+@media all and (max-width: 992px) {
+	
+	.well2{
+		background: #fff !important;
+	}
+
+	.graficaD{
+		width: 400px;
+		margin-top: 16px;
+	}	
+
+}
+
+@media all and (max-width: 768px ) {
+	
+	.well2{
+		background: #F8F8F8 !important;
+	}
+
+	.graficaT{
+		width: 200px;
+	}
+
+	.graficaD{
+		width: 300px;
+		margin-top: 16px;
+	}	
+}

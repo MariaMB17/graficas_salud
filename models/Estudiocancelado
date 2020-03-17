@@ -1,0 +1,51 @@
+<?php
+
+namespace app\models;
+
+use Yii;
+use yii\base\Model;
+
+
+/**
+ * This is the model class for table "configuracion".
+ *
+ * @property integer $ID
+ * @property string $SERVIDOR
+ * @property string $BASE_DATOS
+ * @property string $USUARIO
+ * @property string $CLAVE
+ */
+class Estudiocancelado extends model
+{
+    
+    public $unidadEjecutora;
+    public $porRazon;
+    public $mesMes;
+    public $agendamiento;
+    public $tipoEstudio;
+
+    /**
+     * @inheritdoc
+     */
+    public function rules()
+    {
+        return [
+            [['unidadEjecutora','porRazon','mesMes','agendamiento','tipoEstudio'], 'require'],
+            [['unidadEjecutora','porRazon','mesMes','agendamiento','tipoEstudio'], 'string'],
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function attributeLabels()
+    {
+        return [
+            'unidadEjecutora' => 'Unidad Ejecutora',
+            'porRazon' => 'Por Razon',
+            'mesMes' => 'Ver mes a mes',
+            'agendamiento' => 'T. entre agendamiento y cita',
+            'tipoEstudio' => 'Tipo de Estudio',
+        ];
+    }
+}

@@ -1,0 +1,236 @@
+/*========== Provincias ================*/
+
+Update dashboard d
+Set provincia = (Select p.provincia From provincias p Where p.codigo = d.CODIGO_UNIDAD_EJECUTORA)
+
+/*=========== INDICADORES DE CLAVE ================*/
+
+SELECT `CODIGO_PACIENTE`,`PROVINCIA`,`CODIGO_UNIDAD_EJECUTORA`, UNIDAD_EJECUTORA,`PROCEDENCIA`,`ESTUDIO`,`TIPO_PACIENTE`,`FECHA_APROBADO`,`FECHA_AGENDADO`,`FECHA_HECHO`,`FECHA_CANCELADO`,`INFORMADO`,`NO_ACUDIO`,
+(case when FECHA_AGENDADO<=FECHA_APROBADO THEN datediff(`FECHA_AGENDADO`,`FECHA_APROBADO`) ELSE 0 END) as dias_transcurridos,
+(case when FECHA_AGENDADO<=FECHA_APROBADO THEN TIMESTAMPDIFF(HOUR,`FECHA_AGENDADO`,`FECHA_APROBADO`) ELSE 0 END) as HORAS,
+(case when `FECHA_HECHO`<>'0000-00-00 00:00:00' then 1 else 0 end) as E_REALIZADOS,
+(case when `INFORMADO`='informado' then 1 else 0 end) as E_INFORMADOS,
+(case when `INFORMADO`='no informado' then 1 else 0 end) as E_PENDIENTES,
+(CASE WHEN `FECHA_APROBADO`<>'0000-00-00 00:00:00' THEN 1 else 0 end) as E_APROBADOS,
+(case when `FECHA_CANCELADO`<>'0000-00-00 00:00:00' then 1 else 0 end) as E_CANCELADOS,
+(case when `FECHA_AGENDADO`<>'0000-00-00 00:00:00' then 1 else 0 end) as E_PLANIFICADOS,
+(CASE MID(`FECHA_AGENDADO`,6,2)
+WHEN 01 THEN 'ENERO'
+WHEN 02 THEN 'FEBRERO'
+WHEN 03 THEN 'MARZO'
+WHEN 04 THEN 'ABRIL'
+WHEN 05 THEN 'MAYO'
+WHEN 06 THEN 'JUNIO'
+WHEN 07 THEN 'JULIO'
+WHEN 08 THEN 'AGOSTO'
+WHEN 09 THEN 'SEPTIEMBRE'
+WHEN 10 THEN 'OCTUBRE'
+WHEN 11 THEN 'NOVIEMBRE'
+WHEN 12 THEN 'DICIEMBRE'
+else '0' end) as MES,
+`CON_INTERPRETACION_POSTERIOR`
+FROM dashboard
+
+SELECT `CODIGO_PACIENTE`,`PROVINCIA`,`CODIGO_UNIDAD_EJECUTORA`, UNIDAD_EJECUTORA,`PROCEDENCIA`,`ESTUDIO`,`TIPO_PACIENTE`,`FECHA_APROBADO`,`FECHA_AGENDADO`,`FECHA_HECHO`,`FECHA_CANCELADO`,`INFORMADO`,`NO_ACUDIO`,
+`DIAS_APROBADO`,
+(case when `FECHA_HECHO`<>'0000-00-00 00:00:00' then 1 else 0 end) as E_REALIZADOS,
+(case when `INFORMADO`='informado' then 1 else 0 end) as E_INFORMADOS,
+(case when `INFORMADO`='no informado' then 1 else 0 end) as E_PENDIENTES,
+(CASE WHEN `FECHA_APROBADO`<>'0000-00-00 00:00:00' THEN 1 else 0 end) as E_APROBADOS,
+(case when `FECHA_CANCELADO`<>'0000-00-00 00:00:00' then 1 else 0 end) as E_CANCELADOS,
+(case when `FECHA_AGENDADO`<>'0000-00-00 00:00:00' then 1 else 0 end) as E_PLANIFICADOS,
+(CASE MID(`FECHA_AGENDADO`,6,2)
+WHEN 01 THEN 'ENERO'
+WHEN 02 THEN 'FEBRERO'
+WHEN 03 THEN 'MARZO'
+WHEN 04 THEN 'ABRIL'
+WHEN 05 THEN 'MAYO'
+WHEN 06 THEN 'JUNIO'
+WHEN 07 THEN 'JULIO'
+WHEN 08 THEN 'AGOSTO'
+WHEN 09 THEN 'SEPTIEMBRE'
+WHEN 10 THEN 'OCTUBRE'
+WHEN 11 THEN 'NOVIEMBRE'
+WHEN 12 THEN 'DICIEMBRE'
+else '0' end) as MES,
+`CON_INTERPRETACION_POSTERIOR`
+FROM dashboard
+
+
+/*=========== NUEVA VISTA DE INDICADORES DE CLAVE ================*/
+
+SELECT `PROVINCIA`,`CODIGO_UNIDAD_EJECUTORA`,`UNIDAD_EJECUTORA`,MONTH(FECHA_APROBADO) AS MESES,MES,DIAS_APROBADO,SUBSTRING(TIPO_PACIENTE,1,11) AS TIPO_PACIENTE FROM tiempopromedios WHERE TIPO_PACIENTE LIKE '%Ambulatorio%' AND year(`FECHA_HECHO`)=year(now())
+UNION ALL
+SELECT `PROVINCIA`,`CODIGO_UNIDAD_EJECUTORA`,`UNIDAD_EJECUTORA`,MONTH(FECHA_APROBADO) AS MESES,MES,DIAS_APROBADO,SUBSTRING(TIPO_PACIENTE,1,13) AS TIPO_PACIENTE FROM tiempopromedios WHERE TIPO_PACIENTE LIKE '%Hospitalizado%' AND year(`FECHA_HECHO`)=year(now())
+UNION ALL
+SELECT `PROVINCIA`,`CODIGO_UNIDAD_EJECUTORA`,`UNIDAD_EJECUTORA`,MONTH(FECHA_APROBADO) AS MESES,MES,DIAS_APROBADO,SUBSTRING(TIPO_PACIENTE,1,8) FROM tiempopromedios WHERE TIPO_PACIENTE LIKE '%Urgencia%' AND year(`FECHA_HECHO`)=year(now())
+
+SELECT (`E_REALIZADOS`) AS ESTUDIOS,month(`FECHA_HECHO`) AS MESES,`PROVINCIA`,`CODIGO_UNIDAD_EJECUTORA`,`UNIDAD_EJECUTORA` FROM tiempopromedios WHERE `E_REALIZADOS` ='1' AND year(`FECHA_HECHO`)=year(now())
+UNION ALL
+SELECT (`E_APROBADOS`) AS ESTUDIOS,month(`FECHA_APROBADO`) AS MESES,`PROVINCIA`,`CODIGO_UNIDAD_EJECUTORA`,`UNIDAD_EJECUTORA` FROM tiempopromedios WHERE E_APROBADOS ='1' AND year(`FECHA_APROBADO`)=year(now())
+UNION ALL
+SELECT (`CON_INTERPRETACION_POSTERIOR`) AS ESTUDIOS,MONTH(`FECHA_APROBADO`) as MESES,`PROVINCIA`,`CODIGO_UNIDAD_EJECUTORA`,`UNIDAD_EJECUTORA` FROM `tiempopromedios` WHERE `CON_INTERPRETACION_POSTERIOR` ='Y' AND year(`FECHA_APROBADO`)=year(now())
+UNION ALL
+SELECT (`E_CANCELADOS`) AS ESTUDIOS,MONTH(`FECHA_CANCELADO`) AS MESES,`PROVINCIA`,`CODIGO_UNIDAD_EJECUTORA`,`UNIDAD_EJECUTORA` FROM `tiempopromedios` WHERE `E_CANCELADOS` ='1' AND year(`FECHA_CANCELADO`)=year(now())
+UNION ALL
+SELECT (`E_PENDIENTES`) AS ESTUDIOS,MONTH(`FECHA_HECHO`) AS MESES,`PROVINCIA`,`CODIGO_UNIDAD_EJECUTORA`,`UNIDAD_EJECUTORA` FROM `tiempopromedios` WHERE `E_PENDIENTES` ='1' AND year(`FECHA_HECHO`)=year(now())
+
+
+
+
+/*===========TIEMPO DE INFORME ================*/
+
+SELECT `INDICADOR`,TIEMPO_SERVICIOS,
+(case mid(`INCIDENCIA`,6,2)
+ when 01 then 'ENERO'
+ when 02 then 'FEBRERO'
+ when 03 then 'MARZO'
+ when 04 then 'ABRIL'
+ when 05 then 'MAYO'
+ when 06 then 'JUNIO'
+ when 07 then 'JULIO'
+ when 08 then 'AGOSTO'
+ when 09 then 'SEPTIEMBRE'
+ when 10 then 'OCTUBRE'
+ when 11 then 'NOVIEMBRE'
+ when 12 then 'DICIEMBRE'
+ else 0 end) as MES FROM `disponibilidad`
+group by `INDICADOR`
+
+
+
+SELECT `INDICADOR`,sum(`TIEMPO_SERVICIOS`) as total,
+(case mid(`INCIDENCIA`,6,2)
+ when 01 then 'Enero'
+ when 02 then 'Febrero'
+ when 03 then 'Marzo'
+ when 04 then 'Abril'
+ when 05 then 'Mayo'
+ when 06 then 'Junio'
+ when 07 then 'Julio'
+ when 08 then 'Agosto'
+ when 09 then 'Septiembre'
+ when 10 then 'Octubre'
+ when 11 then 'Noviembre'
+ when 12 then 'Diciembre'
+ else 0 end) as mes FROM `disponibilidad`
+group by `mes`
+
+
+/*===========TIEMPO DE INFORME ================*/
+
+SELECT `CODIGO_ESTUDIO`,`UNIDAD_EJECUTORA`,`PROVINCIA`,`TIPO_PACIENTE`,`ORIGEN_APROBACION`,`DIAS_APROBADO`,
+(CASE MID(`FECHA_AGENDADO`,6,2)
+WHEN 01 THEN 'ENERO'
+WHEN 02 THEN 'FEBRERO'
+WHEN 03 THEN 'MARZO'
+WHEN 04 THEN 'ABRIL'
+WHEN 05 THEN 'MAYO'
+WHEN 06 THEN 'JUNIO'
+WHEN 07 THEN 'JULIO'
+WHEN 08 THEN 'AGOSTO'
+WHEN 09 THEN 'SEPTIEMBRE'
+WHEN 10 THEN 'OCTUBRE'
+WHEN 11 THEN 'NOVIEMBRE'
+WHEN 12 THEN 'DICIEMBRE'
+else '0' end) as MES
+FROM `dashboard`
+
+
+/*===========TIEMPO DE INFORME BIGOTE ================*/
+
+SELECT
+(case when substring(unidad_ejecutora,1,21)='Hospital Regional Dr.' THEN substring(unidad_ejecutora,22)
+when substring(unidad_ejecutora,1,11)='Hospital de' THEN substring(unidad_ejecutora,12)
+when substring(unidad_ejecutora,1,12)='Hospital Dr.' THEN substring(unidad_ejecutora,13)
+when substring(unidad_ejecutora,1,13)='Hospital Dra.' THEN substring(unidad_ejecutora,14)
+when substring(unidad_ejecutora,1,8)='Hospital' THEN substring(unidad_ejecutora,9)
+when substring(unidad_ejecutora,1,22)='Policlínica Básica Dr.' THEN substring(unidad_ejecutora,23)
+when substring(unidad_ejecutora,1,15)='Policlínica Don' THEN substring(unidad_ejecutora,16)
+when substring(unidad_ejecutora,1,15)='Policlínica Dr.' THEN substring(unidad_ejecutora,16)
+when substring(unidad_ejecutora,1,15)='Policlínica Dr.' THEN substring(unidad_ejecutora,16)
+when substring(unidad_ejecutora,1,11)='Policlínica' THEN substring(unidad_ejecutora,12)
+when substring(unidad_ejecutora,1,23)='Policlínica Hospital de' THEN substring(unidad_ejecutora,24)
+when substring(unidad_ejecutora,1,9)='ULAPS Dr.' THEN substring(unidad_ejecutora,10)
+when substring(unidad_ejecutora,1,5)='ULAPS' THEN substring(unidad_ejecutora,6)
+when substring(unidad_ejecutora,1,11)='ULAPS Prof.' THEN substring(unidad_ejecutora,12)
+when substring(unidad_ejecutora,1,8)='Complejo' THEN 'Complejo'ELSE 0 END) AS U_EJECUTORA,
+SUM(`DIAS_APROBADO`) as DIAS_APROBADOS,MAX(`DIAS_APROBADO`) AS MAX, MIN(`DIAS_APROBADO`) AS MIN,
+SUM(case when substring(`TIPO_PACIENTE`,1,11)='Ambulatorio' THEN 1 ELSE 0 END) AS AMBULATORIOS,
+SUM(case when substring(`TIPO_PACIENTE`,1,13)='Hospitalizado' THEN 1 ELSE 0 END) AS HOSPITALIZADOS,`INFORMADO`
+FROM `dashboard`
+WHERE `INFORMADO`='informado' and `UNIDAD_EJECUTORA` IS NOT NULL
+group by U_EJECUTORA
+order by U_EJECUTORA
+
+/*===========TIEMPO DE INFORME BIGOTE2 ================*/
+
+SELECT
+(case when substring(unidad_ejecutora,1,21)='Hospital Regional Dr.' THEN substring(unidad_ejecutora,22)
+when substring(unidad_ejecutora,1,11)='Hospital de' THEN substring(unidad_ejecutora,12)
+when substring(unidad_ejecutora,1,12)='Hospital Dr.' THEN substring(unidad_ejecutora,13)
+when substring(unidad_ejecutora,1,13)='Hospital Dra.' THEN substring(unidad_ejecutora,14)
+when substring(unidad_ejecutora,1,8)='Hospital' THEN substring(unidad_ejecutora,9)
+when substring(unidad_ejecutora,1,22)='Policlínica Básica Dr.' THEN substring(unidad_ejecutora,23)
+when substring(unidad_ejecutora,1,15)='Policlínica Don' THEN substring(unidad_ejecutora,16)
+when substring(unidad_ejecutora,1,15)='Policlínica Dr.' THEN substring(unidad_ejecutora,16)
+when substring(unidad_ejecutora,1,15)='Policlínica Dr.' THEN substring(unidad_ejecutora,16)
+when substring(unidad_ejecutora,1,11)='Policlínica' THEN substring(unidad_ejecutora,12)
+when substring(unidad_ejecutora,1,23)='Policlínica Hospital de' THEN substring(unidad_ejecutora,24)
+when substring(unidad_ejecutora,1,9)='ULAPS Dr.' THEN substring(unidad_ejecutora,10)
+when substring(unidad_ejecutora,1,5)='ULAPS' THEN substring(unidad_ejecutora,6)
+when substring(unidad_ejecutora,1,11)='ULAPS Prof.' THEN substring(unidad_ejecutora,12)
+when substring(unidad_ejecutora,1,8)='Complejo' THEN 'Complejo'ELSE 0 END) AS U_EJECUTORA,
+SUM(`DIAS_APROBADO`) as DIAS_APROBADOS,
+(case when substring(`TIPO_PACIENTE`,1,11)='Ambulatorio' AND `DIAS_APROBADO`>=0 THEN MAX(DIAS_APROBADO) ELSE 0 END) AS MAX_AMB,
+(case when substring(`TIPO_PACIENTE`,1,11)='Ambulatorio' AND `DIAS_APROBADO`>=0 THEN MIN(DIAS_APROBADO) END) AS MIN_AMB,
+(case when substring(`TIPO_PACIENTE`,1,13)='Hospitalizado' AND `DIAS_APROBADO`>=0 THEN MAX(DIAS_APROBADO) ELSE 0 END) AS MAX_HOSP,
+(case when substring(`TIPO_PACIENTE`,1,13)='Hospitalizado' AND `DIAS_APROBADO`>=0 THEN MIN(DIAS_APROBADO) END) AS MIN_HOSP,
+SUM(case when substring(`TIPO_PACIENTE`,1,11)='Ambulatorio' THEN 1 ELSE 0 END) AS AMBULATORIOS,
+SUM(case when substring(`TIPO_PACIENTE`,1,13)='Hospitalizado' THEN 1 ELSE 0 END) AS HOSPITALIZADOS
+FROM `dashboard`
+WHERE `UNIDAD_EJECUTORA` IS NOT NULL
+group by U_EJECUTORA
+order by U_EJECUTORA
+
+
+
+
+
+SELECT `ASIGNADO_A`,SUM(case when `FECHA_HECHO` IS NOT NULL OR `FECHA_HECHO`<> '0000-00-00 00:00:00' AND ASIGNADO_A IS NOT NULL THEN 1 else 0 end) as POR_TECNICO,`UNIDAD_EJECUTORA`
+FROM `dashboard`
+
+
+WHERE `UNIDAD_EJECUTORA` IS NOT NULL
+GROUP BY `UNIDAD_EJECUTORA`
+
+
+
+
+
+
+
+SELECT SUM(`E_AGENDADOS`) AS TOTAL_AGENDADOS,SUM(E_CANCELADOS) AS TOTAL_CANCELADOS,MONTH(`FECHA_CANCELADO`) as MES,
+(case when substring(unidad_ejecutora,1,21)='Hospital Regional Dr.' THEN substring(unidad_ejecutora,22)
+when substring(unidad_ejecutora,1,11)='Hospital de' THEN substring(unidad_ejecutora,12)
+when substring(unidad_ejecutora,1,12)='Hospital Dr.' THEN substring(unidad_ejecutora,13)
+when substring(unidad_ejecutora,1,13)='Hospital Dra.' THEN substring(unidad_ejecutora,14)
+when substring(unidad_ejecutora,1,8)='Hospital' THEN substring(unidad_ejecutora,9)
+when substring(unidad_ejecutora,1,22)='Policlínica Básica Dr.' THEN substring(unidad_ejecutora,23)
+when substring(unidad_ejecutora,1,15)='Policlínica Don' THEN substring(unidad_ejecutora,16)
+when substring(unidad_ejecutora,1,15)='Policlínica Dr.' THEN substring(unidad_ejecutora,16)
+when substring(unidad_ejecutora,1,15)='Policlínica Dr.' THEN substring(unidad_ejecutora,16)
+when substring(unidad_ejecutora,1,11)='Policlínica' THEN substring(unidad_ejecutora,12)
+when substring(unidad_ejecutora,1,23)='Policlínica Hospital de' THEN substring(unidad_ejecutora,24)
+when substring(unidad_ejecutora,1,9)='ULAPS Dr.' THEN substring(unidad_ejecutora,10)
+when substring(unidad_ejecutora,1,5)='ULAPS' THEN substring(unidad_ejecutora,6)
+when substring(unidad_ejecutora,1,11)='ULAPS Prof.' THEN substring(unidad_ejecutora,12)
+when substring(unidad_ejecutora,1,8)='Complejo' THEN 'Complejo'ELSE 0 END) AS U_EJECUTORA
+FROM `estudioscancelados`
+where MONTH(`FECHA_CANCELADO`)=06 and `E_PLANIFICADOS`=1
+group by U_EJECUTORA
+order by MONTH(`FECHA_CANCELADO`)
+
+
+SELECT sum(`TOTAL_AGENDADOS`) as TOTAL_AGENDADOS,
+sum(`TOTAL_CANCELADOS`) as TOTAL_CANCELADOS,`U_EJECUTORA`,`MES` FROM `e_cancelados` where `MES`=06 and `U_EJECUTORA` like '%Rafael Estevez%' group by U_EJECUTORA

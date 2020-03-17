@@ -1,0 +1,22 @@
+#.htaccess Tutotial
+
+Options +Indexes
+IndexOptions FancyIndexing
+
+#DirectoryIndex index.php
+
+#<FilesMatch "\.(js|css|ico|pdf|flv|jpg|jpeg|png|gif|swf|mp3|mp4)$">
+#Header set Cache-Control "public"
+#Header set Expires "Thu, 15 Apr 2020 20:00:00 GMT"
+#</FilesMatch>
+
+#<FilesMatch "\.(js|css|ico|pdf|jpg|jpeg|png|gif|php)$">
+#SetOutputFilter DEFLATE
+#</FilesMatch>
+
+#Header unset ETag
+#FileETag None
+
+#<FilesMatch "\.(js|css|ico|pdf|flv|jpg|jpeg|png|gif|swf|mp3|mp4)$">
+#Header unset Last-Modified
+#</FilesMatch>
